@@ -15,8 +15,7 @@ export default function HomePage() {
         </h1>
         <p className="max-w-2xl text-lg text-zinc-400 leading-relaxed">
           I write about <span className="text-zinc-200">cybersecurity</span>,{" "}
-          <span className="text-zinc-200">networking</span>, and document my personal projects.
-          Occasionally I share CTF writeups and security research notes.
+          <span className="text-zinc-200">networking</span>, and share my projects or the projects completed by me and my classmates together.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <Link

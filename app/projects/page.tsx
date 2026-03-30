@@ -71,6 +71,16 @@ function ProjectCard({ project }: { project: (typeof projects)[number] }) {
             GitHub →
           </a>
         )}
+        {project.gitlab && (
+          <a
+            href={project.gitlab}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-orange-400 hover:text-orange-300 underline underline-offset-2"
+          >
+            GitLab →
+          </a>
+        )}
         {project.demo && (
           <a
             href={project.demo}

@@ -15,20 +15,9 @@ export default function AboutPage() {
 
       <section className="space-y-4 text-zinc-300 leading-7">
         <p>
-          Hi! I&apos;m HAL, a computer science student with a deep interest in
+          Hi! I&apos;m Nagisa, a computer science student with a deep interest in
           <strong className="text-zinc-200"> cybersecurity</strong> and{" "}
-          <strong className="text-zinc-200">networking</strong>. I spend a lot of time reading
-          RFCs, breaking things in CTF challenges, and building tools to better understand how
-          systems work at a low level.
-        </p>
-        <p>
-          This blog is where I document what I learn — ARP spoofing, network protocols,
-          penetration testing concepts, and whatever rabbit holes I fall into each week. I write
-          for my future self and for anyone who finds value in detailed technical notes.
-        </p>
-        <p>
-          When I&apos;m not hacking on projects, I&apos;m contributing to open-source, playing
-          CTFs, or experimenting with homelab setups.
+          <strong className="text-zinc-200">networking</strong>. I love exploring how things work under the hood, whether it&apos;s dissecting network protocols, analyzing malware samples, or building small tools to automate tedious tasks. I&apos;m passionate about learning and sharing knowledge, which is why I started this blog.
         </p>
       </section>
 
@@ -38,11 +27,15 @@ export default function AboutPage() {
           {[
             "Cybersecurity",
             "Networking",
-            "CTF Challenges",
+            "Systems Programming",
+            "Machine Learning",
             "Linux",
-            "Python",
             "Packet Analysis",
             "Reverse Engineering",
+            "PHP",
+            "C++",
+            "Python",
+            "JAVA",
             "Open Source",
           ].map((item) => (
             <span
@@ -53,29 +46,6 @@ export default function AboutPage() {
             </span>
           ))}
         </div>
-      </section>
-
-      <section>
-        <h2 className="mb-4 text-lg font-semibold text-zinc-100">Contact</h2>
-        <ul className="space-y-2 text-sm text-zinc-400">
-          <li>
-            GitHub:{" "}
-            <a
-              href="https://github.com/yourname"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-400 hover:text-emerald-300"
-            >
-              @yourname
-            </a>
-          </li>
-          <li>
-            Email:{" "}
-            <a href="mailto:you@example.com" className="text-emerald-400 hover:text-emerald-300">
-              you@example.com
-            </a>
-          </li>
-        </ul>
       </section>
     </div>
   );
