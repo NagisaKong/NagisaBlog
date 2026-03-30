@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import type { ProjectRow } from "@/lib/db";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ProjectForm({ project }: { project?: ProjectRow }) {
   const router = useRouter();
@@ -136,7 +136,7 @@ export default function ProjectForm({ project }: { project?: ProjectRow }) {
           id="featured"
           checked={featured}
           onCheckedChange={setFeatured}
-          className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-600 [&>span]:bg-white [&>span]:shadow-md [&>span]:border [&>span]:border-zinc-300"
+          className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-900 [&>span]:bg-emerald-600 [&>span]:shadow-md [&>span]:border [&>span]:border-zinc-300"
         />
         <label htmlFor="featured" className="text-sm text-zinc-300 cursor-pointer">
           Featured project
@@ -152,7 +152,7 @@ export default function ProjectForm({ project }: { project?: ProjectRow }) {
           variant="outline"
           onClick={() => window.location.href = "/admin/projects"}
           disabled={saving}
-          className="border-zinc-500 text-zinc-200 hover:bg-zinc-700 hover:text-white"
+          className="border-zinc-500 text-black hover:bg-zinc-700 hover:text-white"
         >
           Cancel
         </Button>
