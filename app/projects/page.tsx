@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { projects } from "@/lib/projects";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -14,7 +14,6 @@ export default function ProjectsPage() {
     <div className="space-y-10">
       <div>
         <h1 className="mb-2 text-3xl font-bold text-zinc-100">Projects</h1>
-        <p className="text-zinc-400">Things I&apos;ve built and am building.</p>
       </div>
 
       {featured.length > 0 && (
