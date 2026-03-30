@@ -54,8 +54,7 @@ export default function ProjectForm({ project }: { project?: ProjectRow }) {
       return;
     }
 
-    router.push("/admin/projects");
-    router.refresh();
+    window.location.href = "/admin/projects";
   }
 
   return (
@@ -133,21 +132,27 @@ export default function ProjectForm({ project }: { project?: ProjectRow }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Switch id="featured" checked={featured} onCheckedChange={setFeatured} />
-        <label htmlFor="featured" className="text-sm text-zinc-400">
+        <Switch
+          id="featured"
+          checked={featured}
+          onCheckedChange={setFeatured}
+          className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-600 [&>span]:bg-white [&>span]:shadow-md [&>span]:border [&>span]:border-zinc-300"
+        />
+        <label htmlFor="featured" className="text-sm text-zinc-300 cursor-pointer">
           Featured project
         </label>
       </div>
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-500">
+        <Button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-500 text-white">
           {saving ? "Saving…" : isEdit ? "Save changes" : "Create project"}
         </Button>
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/admin/projects")}
+          onClick={() => window.location.href = "/admin/projects"}
           disabled={saving}
+          className="border-zinc-500 text-zinc-200 hover:bg-zinc-700 hover:text-white"
         >
           Cancel
         </Button>

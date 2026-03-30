@@ -65,8 +65,7 @@ export default function PostForm({ post }: { post?: PostRow }) {
       return;
     }
 
-    router.push("/admin/posts");
-    router.refresh();
+    window.location.href = "/admin/posts";
   }
 
   return (
@@ -136,21 +135,23 @@ export default function PostForm({ post }: { post?: PostRow }) {
           id="published"
           checked={published}
           onCheckedChange={setPublished}
+          className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-600 [&>span]:bg-white [&>span]:shadow-md [&>span]:border [&>span]:border-zinc-300"
         />
-        <label htmlFor="published" className="text-sm text-zinc-400">
+        <label htmlFor="published" className="text-sm text-zinc-300 cursor-pointer">
           Published
         </label>
       </div>
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-500">
+        <Button type="submit" disabled={saving} className="bg-emerald-600 hover:bg-emerald-500 text-white">
           {saving ? "Saving…" : isEdit ? "Save changes" : "Create post"}
         </Button>
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/admin/posts")}
+          onClick={() => window.location.href = "/admin/posts"}
           disabled={saving}
+          className="border-zinc-500 text-zinc-200 hover:bg-zinc-700 hover:text-white"
         >
           Cancel
         </Button>
