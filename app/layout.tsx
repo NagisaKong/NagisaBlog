@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,6 +40,7 @@ export default function RootLayout({
         <footer className="border-t border-zinc-800 py-8 text-center text-xs text-zinc-600">
           © {new Date().getFullYear()} Nagisa. Built with Next.js & MDX.
         </footer>
+        <Analytics />
       </body>
     </html>
   );

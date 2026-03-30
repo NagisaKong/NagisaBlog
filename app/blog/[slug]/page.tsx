@@ -2,7 +2,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import {
+  getAllPosts as getAllPostsFromDB,
+  getPostBySlug as getPostBySlugFromDB,
+  postRowToMeta,
+} from "@/lib/db";
+import { getAllPosts as getAllPostsFromFS, getPostBySlug as getPostBySlugFromFS } from "@/lib/posts";
 import { mdxComponents } from "@/components/MDXComponents";
 import TableOfContents from "@/components/TableOfContents";
 import GiscusComments from "@/components/GiscusComments";
@@ -13,36 +18,72 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+  try {
+    const rows = await getAllPostsFromDB();
+    return rows.map((r) => ({ slug: r.slug }));
+  } catch {
+    return getAllPostsFromFS().map((p) => ({ slug: p.slug }));
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
-  if (!post) return {};
+
+  let title = "";
+  let description = "";
+
+  try {
+    const row = await getPostBySlugFromDB(slug);
+    if (row) {
+      title = row.title;
+      description = row.description ?? "";
+    }
+  } catch {
+    const post = getPostBySlugFromFS(slug);
+    if (post) {
+      title = post.title;
+      description = post.description;
+    }
+  }
 
   return {
-    title: post.title,
-    description: post.description,
-    openGraph: {
-      title: post.title,
-      description: post.description,
-      type: "article",
-      publishedTime: post.date,
-    },
+    title,
+    description,
+    openGraph: { title, description, type: "article" },
   };
 }
 
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
-  if (!post) notFound();
+
+  let title = "";
+  let date = "";
+  let tags: string[] = [];
+  let readingTime = 0;
+  let content = "";
+
+  try {
+    const row = await getPostBySlugFromDB(slug);
+    if (!row) notFound();
+    const meta = postRowToMeta(row);
+    title = meta.title;
+    date = meta.date;
+    tags = meta.tags;
+    readingTime = meta.readingTime;
+    content = row.content;
+  } catch {
+    const post = getPostBySlugFromFS(slug);
+    if (!post) notFound();
+    title = post.title;
+    date = post.date;
+    tags = post.tags;
+    readingTime = post.readingTime;
+    content = post.content;
+  }
 
   return (
     <div className="flex gap-12">
-      {/* Article */}
       <div className="min-w-0 flex-1">
-        {/* Back */}
         <Link
           href="/blog"
           className="mb-8 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-300"
@@ -50,10 +91,9 @@ export default async function PostPage({ params }: Props) {
           ← Back to blog
         </Link>
 
-        {/* Header */}
         <header className="mb-8">
           <div className="mb-3 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
+            {tags.map((tag) => (
               <Link
                 key={tag}
                 href={`/blog?tag=${tag}`}
@@ -63,29 +103,22 @@ export default async function PostPage({ params }: Props) {
               </Link>
             ))}
           </div>
-          <h1 className="mb-3 text-3xl font-bold leading-tight text-zinc-100">{post.title}</h1>
+          <h1 className="mb-3 text-3xl font-bold leading-tight text-zinc-100">{title}</h1>
           <div className="flex items-center gap-3 text-sm text-zinc-500">
-            <time dateTime={post.date}>{post.date}</time>
+            <time dateTime={date}>{date}</time>
             <span>·</span>
-            <span>{post.readingTime} min read</span>
+            <span>{readingTime} min read</span>
           </div>
         </header>
 
-        {/* Content */}
         <article className="prose-custom">
           <MDXRemote
-            source={post.content}
+            source={content}
             components={mdxComponents}
             options={{
               mdxOptions: {
                 rehypePlugins: [
-                  [
-                    rehypePrettyCode,
-                    {
-                      theme: "github-dark",
-                      keepBackground: true,
-                    },
-                  ],
+                  [rehypePrettyCode, { theme: "github-dark", keepBackground: true }],
                 ],
               },
             }}
@@ -95,7 +128,6 @@ export default async function PostPage({ params }: Props) {
         <GiscusComments />
       </div>
 
-      {/* TOC */}
       <TableOfContents />
     </div>
   );

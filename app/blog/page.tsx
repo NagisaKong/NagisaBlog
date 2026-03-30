@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts as getAllPostsFromDB, postRowToMeta } from "@/lib/db";
+import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 import TagFilter from "@/components/TagFilter";
+import type { PostMeta } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -12,6 +14,15 @@ export const metadata: Metadata = {
     description: "Articles on cybersecurity, networking, and CS projects.",
   },
 };
+
+async function fetchPosts(): Promise<PostMeta[]> {
+  try {
+    const rows = await getAllPostsFromDB();
+    return rows.map(postRowToMeta);
+  } catch {
+    return getAllPostsFromFS();
+  }
+}
 
 export default function BlogPage({
   searchParams,
@@ -31,7 +42,7 @@ async function BlogContent({
   searchParams: Promise<{ tag?: string }>;
 }) {
   const { tag } = await searchParams;
-  const allPosts = getAllPosts();
+  const allPosts = await fetchPosts();
   const allTags = Array.from(new Set(allPosts.flatMap((p) => p.tags))).sort();
   const posts = tag ? allPosts.filter((p) => p.tags.includes(tag)) : allPosts;
 
