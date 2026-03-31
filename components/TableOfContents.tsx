@@ -58,7 +58,12 @@ export default function TableOfContents() {
             <li key={h.id} style={{ paddingLeft: h.level === 3 ? "0.75rem" : "0" }}>
               <a
                 href={`#${h.id}`}
-                className={`block text-sm transition-colors ${
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+                  window.history.pushState(null, "", `#${h.id}`);
+                }}
+                className={`block text-sm transition-colors cursor-pointer ${
                   activeId === h.id
                     ? "text-emerald-400"
                     : "text-zinc-500 hover:text-zinc-300"

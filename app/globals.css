@@ -65,6 +65,33 @@ body {
   line-height: 1.7;
 }
 
+/* 移动端：代码块全宽出血显示 */
+@media (max-width: 639px) {
+  [data-rehype-pretty-code-figure] {
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+  [data-rehype-pretty-code-figure] pre {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    font-size: 0.8125rem;
+  }
+  [data-rehype-pretty-code-title] {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* 防止长单词/URL溢出 */
+article {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 [data-rehype-pretty-code-figure] code {
   background: transparent;
   padding: 0;

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSlug from "rehype-slug";
 import {
   getAllPosts as getAllPostsFromDB,
   getPostBySlug as getPostBySlugFromDB,
@@ -11,6 +12,8 @@ import { getAllPosts as getAllPostsFromFS, getPostBySlug as getPostBySlugFromFS 
 import { mdxComponents } from "@/components/MDXComponents";
 import TableOfContents from "@/components/TableOfContents";
 import GiscusComments from "@/components/GiscusComments";
+import ViewCounter from "@/components/ViewCounter";
+import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
 
 type Props = {
@@ -103,11 +106,13 @@ export default async function PostPage({ params }: Props) {
               </Link>
             ))}
           </div>
-          <h1 className="mb-3 text-3xl font-bold leading-tight text-zinc-100">{title}</h1>
-          <div className="flex items-center gap-3 text-sm text-zinc-500">
+          <h1 className="mb-3 text-2xl sm:text-3xl font-bold leading-tight text-zinc-100">{title}</h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
             <time dateTime={date}>{date}</time>
             <span>·</span>
             <span>{readingTime} min read</span>
+            <span>·</span>
+            <ViewCounter slug={slug} />
           </div>
         </header>
 
@@ -118,6 +123,7 @@ export default async function PostPage({ params }: Props) {
             options={{
               mdxOptions: {
                 rehypePlugins: [
+                  rehypeSlug,
                   [rehypePrettyCode, { theme: "github-dark", keepBackground: true }],
                 ],
               },
@@ -125,6 +131,7 @@ export default async function PostPage({ params }: Props) {
           />
         </article>
 
+        <LikeButton slug={slug} />
         <GiscusComments />
       </div>
 

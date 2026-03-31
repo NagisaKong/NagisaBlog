@@ -28,6 +28,8 @@ export type PostRow = {
   content: string;
   tags: string[];
   published: boolean;
+  views: number;
+  likes: number;
   created_at: string;
   updated_at: string;
 };
@@ -127,6 +129,34 @@ export async function deletePost(id: number): Promise<void> {
   await sql`DELETE FROM posts WHERE id = ${id}`;
 }
 
+export async function getPostViews(slug: string): Promise<number> {
+  const { rows } = await sql<{ views: number }>`
+    SELECT views FROM posts WHERE slug = ${slug} LIMIT 1
+  `;
+  return rows[0]?.views ?? 0;
+}
+
+export async function incrementPostViews(slug: string): Promise<number> {
+  const { rows } = await sql<{ views: number }>`
+    UPDATE posts SET views = views + 1 WHERE slug = ${slug} RETURNING views
+  `;
+  return rows[0]?.views ?? 0;
+}
+
+export async function getPostLikes(slug: string): Promise<number> {
+  const { rows } = await sql<{ likes: number }>`
+    SELECT likes FROM posts WHERE slug = ${slug} LIMIT 1
+  `;
+  return rows[0]?.likes ?? 0;
+}
+
+export async function incrementPostLikes(slug: string): Promise<number> {
+  const { rows } = await sql<{ likes: number }>`
+    UPDATE posts SET likes = likes + 1 WHERE slug = ${slug} RETURNING likes
+  `;
+  return rows[0]?.likes ?? 0;
+}
+
 // ── Projects ─────────────────────────────────────────────────────────────────
 
 export async function getAllProjects(): Promise<ProjectRow[]> {
@@ -210,9 +240,13 @@ export async function initSchema(): Promise<void> {
       content     TEXT NOT NULL,
       tags        TEXT[] DEFAULT '{}',
       published   BOOLEAN DEFAULT false,
+      views       INTEGER DEFAULT 0,
       created_at  TIMESTAMPTZ DEFAULT NOW(),
       updated_at  TIMESTAMPTZ DEFAULT NOW()
     )
+  `;
+  await sql`
+    ALTER TABLE posts ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0
   `;
   await sql`
     CREATE TABLE IF NOT EXISTS projects (

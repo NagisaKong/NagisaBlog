@@ -7,12 +7,12 @@ export const mdxComponents: MDXComponents = {
   ),
   h2: (props) => (
     <h2
-      className="mt-8 mb-3 text-2xl font-semibold text-zinc-100 scroll-mt-20 border-b border-zinc-800 pb-1"
+      className="mt-8 mb-3 text-xl sm:text-2xl font-semibold text-zinc-100 scroll-mt-20 border-b border-zinc-800 pb-1"
       {...props}
     />
   ),
   h3: (props) => (
-    <h3 className="mt-6 mb-2 text-xl font-semibold text-zinc-200 scroll-mt-20" {...props} />
+    <h3 className="mt-6 mb-2 text-lg sm:text-xl font-semibold text-zinc-200 scroll-mt-20" {...props} />
   ),
   p: (props) => <p className="mb-4 leading-7 text-zinc-300" {...props} />,
   a: ({ href, ...props }) => {

@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { getAllPosts as getAllPostsFromDB, postRowToMeta } from "@/lib/db";
-import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
+import { getAllPosts as getAllPostsFromDB, postRowToMeta } from "@/lib/db";
 import type { PostMeta } from "@/lib/posts";
+import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
+import Link from "next/link";
 
 async function fetchRecentPosts(): Promise<PostMeta[]> {
   try {
@@ -19,15 +19,14 @@ export default async function HomePage() {
   return (
     <div className="space-y-16">
       {/* Hero */}
-      <section className="pt-8">
-        <div className="mb-2 font-mono text-sm text-emerald-400">Welcome to my blog!</div>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-zinc-100">
-          I&apos;m Nagisa, a CS student form UOW.
+      <section className="pt-4 sm:pt-8">
+        <div className="mb-2 font-mono text-sm text-emerald-400">Welcome to my blog</div>
+        <h1 className="mb-4 text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100">
+          秋水叶个人博客
         </h1>
-        <p className="max-w-xl text-lg text-zinc-400 leading-relaxed">
-          I write about <span className="text-zinc-200">cybersecurity</span>,{" "}
+        <p className="max-w-prose text-base sm:text-lg text-zinc-400 leading-relaxed">
+          I&apos;m Nagisa, a CS student form UOW. I write about <span className="text-zinc-200">cybersecurity</span>,{" "}
           <span className="text-zinc-200">networking</span>, and document my personal projects.
-          Occasionally I share CTF writeups and security research notes.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <Link

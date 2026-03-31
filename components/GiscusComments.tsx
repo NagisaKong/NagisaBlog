@@ -11,17 +11,17 @@ export default function GiscusComments() {
     const script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
     // TODO: Replace with your own Giscus config
-    script.setAttribute("data-repo", "yourname/your-blog-comments");
-    script.setAttribute("data-repo-id", "YOUR_REPO_ID");
+    script.setAttribute("data-repo", "NagisaKong/blog-comment");
+    script.setAttribute("data-repo-id", "R_kgDOR1bDJA");
     script.setAttribute("data-category", "Announcements");
-    script.setAttribute("data-category-id", "YOUR_CATEGORY_ID");
+    script.setAttribute("data-category-id", "DIC_kwDOR1bDJM4C5q8t");
     script.setAttribute("data-mapping", "pathname");
     script.setAttribute("data-strict", "0");
     script.setAttribute("data-reactions-enabled", "1");
     script.setAttribute("data-emit-metadata", "0");
     script.setAttribute("data-input-position", "bottom");
-    script.setAttribute("data-theme", "dark");
-    script.setAttribute("data-lang", "en");
+    script.setAttribute("data-theme", "preferred_color_scheme");
+    script.setAttribute("data-lang", "zh-CN");
     script.setAttribute("crossorigin", "anonymous");
     script.async = true;
     ref.current.appendChild(script);
