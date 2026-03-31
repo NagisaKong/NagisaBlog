@@ -3,6 +3,8 @@ import { getAllPostsAdmin } from "@/lib/db";
 import { Badge } from "@/components/ui/badge";
 import DeletePostButton from "./DeletePostButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPostsPage() {
   let posts: Awaited<ReturnType<typeof getAllPostsAdmin>> = [];
   try {
@@ -57,7 +59,7 @@ export default async function AdminPostsPage() {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant={post.published ? "default" : "outline"}>
+                  <Badge variant="default">
                     {post.published ? "Published" : "Draft"}
                   </Badge>
                 </td>

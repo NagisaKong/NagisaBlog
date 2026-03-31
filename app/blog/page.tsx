@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getAllPostsMeta } from "@/lib/db";
+import { getAllPosts, postRowToMeta } from "@/lib/db";
 import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 import TagFilter from "@/components/TagFilter";
 import SearchBar from "@/components/SearchBar";
 import type { PostMeta } from "@/lib/posts";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -16,21 +18,12 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60;
-
 async function fetchPosts(): Promise<PostMeta[]> {
   try {
-    const rows = await getAllPostsMeta();
-    return rows.map((r) => ({
-      slug: r.slug,
-      title: r.title,
-      date: r.created_at.slice(0, 10),
-      description: r.description ?? "",
-      tags: r.tags ?? [],
-      published: r.published,
-      readingTime: r.reading_time,
-    }));
-  } catch {
+    const rows = await getAllPosts();
+    return rows.map(postRowToMeta);
+  } catch (e) {
+    console.error("[blog/page] getAllPosts failed, falling back to FS:", e);
     return getAllPostsFromFS();
   }
 }

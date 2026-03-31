@@ -1,25 +1,17 @@
 import PostCard from "@/components/PostCard";
-import { getAllPostsMeta } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+import { getAllPosts, postRowToMeta } from "@/lib/db";
 import type { PostMeta } from "@/lib/posts";
 import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
 import Link from "next/link";
 
-// ISR：最多 60 秒重新生成一次
-export const revalidate = 60;
-
 async function fetchRecentPosts(): Promise<PostMeta[]> {
   try {
-    const rows = await getAllPostsMeta();
-    return rows.slice(0, 3).map((r) => ({
-      slug: r.slug,
-      title: r.title,
-      date: r.created_at.slice(0, 10),
-      description: r.description ?? "",
-      tags: r.tags ?? [],
-      published: r.published,
-      readingTime: r.reading_time,
-    }));
-  } catch {
+    const rows = await getAllPosts();
+    return rows.slice(0, 3).map(postRowToMeta);
+  } catch (e) {
+    console.error("[app/page] getAllPosts failed, falling back to FS:", e);
     return getAllPostsFromFS().slice(0, 3);
   }
 }

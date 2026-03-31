@@ -195,11 +195,10 @@ export default function PostForm({ post }: { post?: PostRow }) {
           id="published"
           checked={published}
           onCheckedChange={setPublished}
-          className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-900 [&>span]:bg-emerald-600 [&>span]:shadow-md [&>span]:border [&>span]:border-zinc-300"
-
+          className="data-checked:bg-emerald-600 data-unchecked:bg-zinc-600"
         />
         <label htmlFor="published" className="text-sm text-zinc-300 cursor-pointer">
-          Published
+          {published ? "Published" : "Draft"}
         </label>
       </div>
 
@@ -210,7 +209,7 @@ export default function PostForm({ post }: { post?: PostRow }) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => window.location.href = "/admin/posts"}
+          onClick={() => { window.location.href = "/admin/posts"; }}
           disabled={saving}
           className="border-zinc-500 text-black hover:bg-zinc-700 hover:text-white"
         >

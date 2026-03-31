@@ -8,15 +8,18 @@ function pgArray(arr: string[] | undefined | null): string {
 }
 
 export function postRowToMeta(row: PostRow): PostMeta {
-  const words = row.content.trim().split(/\s+/).length;
+  const words = (row.content ?? "").trim().split(/\s+/).filter(Boolean).length;
+  const createdAt = row.created_at instanceof Date
+    ? row.created_at.toISOString()
+    : String(row.created_at);
   return {
     slug: row.slug,
     title: row.title,
-    date: row.created_at.slice(0, 10),
+    date: createdAt.slice(0, 10),
     description: row.description ?? "",
-    tags: row.tags ?? [],
+    tags: Array.isArray(row.tags) ? row.tags : [],
     published: row.published,
-    readingTime: Math.ceil(words / 200),
+    readingTime: Math.max(1, Math.ceil(words / 200)),
   };
 }
 
@@ -30,12 +33,12 @@ export type PostRow = {
   published: boolean;
   views: number;
   likes: number;
-  created_at: string;
-  updated_at: string;
+  created_at: string | Date;
+  updated_at: string | Date;
 };
 
-/** 列表页专用：不含 content，reading_time 由 SQL 计算 */
-export type PostMetaRow = Omit<PostRow, "content"> & { reading_time: number };
+/** 列表页专用：不含 content/likes，reading_time 由 SQL 计算 */
+export type PostMetaRow = Omit<PostRow, "content" | "likes"> & { reading_time: number };
 
 export type ProjectRow = {
   id: number;
@@ -55,7 +58,7 @@ export type ProjectRow = {
 export async function getAllPostsMeta(): Promise<PostMetaRow[]> {
   const { rows } = await sql<PostMetaRow>`
     SELECT
-      id, slug, title, description, tags, published, views, likes,
+      id, slug, title, description, tags, published, views,
       created_at, updated_at,
       GREATEST(1,
         CEIL(
@@ -268,6 +271,9 @@ export async function initSchema(): Promise<void> {
   `;
   await sql`
     ALTER TABLE posts ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0
+  `;
+  await sql`
+    ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0
   `;
   await sql`
     CREATE TABLE IF NOT EXISTS projects (
