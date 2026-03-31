@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -72,7 +72,7 @@ export default function Nav() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 py-3">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 py-3">
 
         {/* 左侧：Logo + 社交图标（桌面端显示社交图标） */}
         <div className="flex items-center gap-3">
@@ -105,9 +105,8 @@ export default function Nav() {
             <li key={href}>
               <Link
                 href={href}
-                className={`text-sm transition-colors ${
-                  pathname === href ? "text-white" : "text-zinc-400 hover:text-zinc-200"
-                }`}
+                className={`text-sm transition-colors ${pathname === href ? "text-white" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
               >
                 {label}
               </Link>
@@ -123,39 +122,34 @@ export default function Nav() {
           aria-expanded={open}
         >
           <span
-            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${
-              open ? "translate-y-2 rotate-45" : ""
-            }`}
+            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${open ? "translate-y-2 rotate-45" : ""
+              }`}
           />
           <span
-            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${
-              open ? "opacity-0" : ""
-            }`}
+            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${open ? "opacity-0" : ""
+              }`}
           />
           <span
-            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${
-              open ? "-translate-y-2 -rotate-45" : ""
-            }`}
+            className={`block h-0.5 w-5 bg-zinc-400 transition-all duration-300 ${open ? "-translate-y-2 -rotate-45" : ""
+              }`}
           />
         </button>
       </nav>
 
       {/* 移动端下拉菜单 */}
       <div
-        className={`sm:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`sm:hidden overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="border-t border-zinc-800 bg-zinc-950 px-4 py-4 space-y-1">
           {links.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                pathname === href
+              className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${pathname === href
                   ? "bg-zinc-800 text-white"
                   : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
-              }`}
+                }`}
             >
               {label}
             </Link>
