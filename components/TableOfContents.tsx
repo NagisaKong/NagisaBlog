@@ -48,11 +48,11 @@ export default function TableOfContents() {
   if (headings.length === 0) return null;
 
   return (
-    <aside className="hidden lg:block sticky top-24 h-fit w-56 shrink-0">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+    <aside className="hidden lg:flex lg:flex-col sticky top-24 w-56 shrink-0" style={{ maxHeight: "calc(100vh - 7rem)" }}>
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 shrink-0">
         On this page
       </p>
-      <nav>
+      <nav className="overflow-y-auto min-h-0">
         <ul className="space-y-1.5">
           {headings.map((h) => (
             <li key={h.id} style={{ paddingLeft: h.level === 3 ? "0.75rem" : "0" }}>
