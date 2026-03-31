@@ -34,6 +34,9 @@ export type PostRow = {
   updated_at: string;
 };
 
+/** 列表页专用：不含 content，reading_time 由 SQL 计算 */
+export type PostMetaRow = Omit<PostRow, "content"> & { reading_time: number };
+
 export type ProjectRow = {
   id: number;
   title: string;
@@ -47,6 +50,24 @@ export type ProjectRow = {
 };
 
 // ── Posts ────────────────────────────────────────────────────────────────────
+
+/** 列表页专用：只取元数据，reading_time 在 SQL 中计算，避免传输大量 content */
+export async function getAllPostsMeta(): Promise<PostMetaRow[]> {
+  const { rows } = await sql<PostMetaRow>`
+    SELECT
+      id, slug, title, description, tags, published, views, likes,
+      created_at, updated_at,
+      GREATEST(1,
+        CEIL(
+          array_length(regexp_split_to_array(trim(content), '\s+'), 1)::numeric / 200
+        )
+      )::int AS reading_time
+    FROM posts
+    WHERE published = true
+    ORDER BY created_at DESC
+  `;
+  return rows;
+}
 
 export async function getAllPosts(): Promise<PostRow[]> {
   const { rows } = await sql<PostRow>`

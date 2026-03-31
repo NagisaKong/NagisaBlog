@@ -147,8 +147,8 @@ export default function Nav() {
               key={href}
               href={href}
               className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${pathname === href
-                  ? "bg-zinc-800 text-white"
-                  : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
+                ? "bg-zinc-800 text-white"
+                : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
                 }`}
             >
               {label}

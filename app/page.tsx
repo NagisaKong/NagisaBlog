@@ -1,13 +1,24 @@
 import PostCard from "@/components/PostCard";
-import { getAllPosts as getAllPostsFromDB, postRowToMeta } from "@/lib/db";
+import { getAllPostsMeta } from "@/lib/db";
 import type { PostMeta } from "@/lib/posts";
 import { getAllPosts as getAllPostsFromFS } from "@/lib/posts";
 import Link from "next/link";
 
+// ISR：最多 60 秒重新生成一次
+export const revalidate = 60;
+
 async function fetchRecentPosts(): Promise<PostMeta[]> {
   try {
-    const rows = await getAllPostsFromDB();
-    return rows.slice(0, 3).map(postRowToMeta);
+    const rows = await getAllPostsMeta();
+    return rows.slice(0, 3).map((r) => ({
+      slug: r.slug,
+      title: r.title,
+      date: r.created_at.slice(0, 10),
+      description: r.description ?? "",
+      tags: r.tags ?? [],
+      published: r.published,
+      readingTime: r.reading_time,
+    }));
   } catch {
     return getAllPostsFromFS().slice(0, 3);
   }
