@@ -198,3 +198,19 @@ article {
     @apply font-sans;
   }
 }
+
+/* 自定义滚动条 — 黑灰风格与网站整体一致 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
