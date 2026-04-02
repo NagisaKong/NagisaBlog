@@ -55,7 +55,7 @@ const socials = [
   },
 ];
 
-export default function Nav() {
+export default function Nav({ logoText = "Nagisa/blog" }: { logoText?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -80,7 +80,7 @@ export default function Nav() {
             href="/"
             className="font-mono text-sm font-bold text-emerald-400 hover:text-emerald-300"
           >
-            Nagisa/blog
+            {logoText}
           </Link>
           <span className="hidden sm:block text-zinc-600">|</span>
           <div className="hidden sm:flex items-center gap-3">

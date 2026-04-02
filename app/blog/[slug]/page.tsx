@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import {
   getAllPosts as getAllPostsFromDB,
   getPostBySlug as getPostBySlugFromDB,
@@ -15,6 +16,8 @@ import GiscusComments from "@/components/GiscusComments";
 import ViewCounter from "@/components/ViewCounter";
 import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -122,6 +125,7 @@ export default async function PostPage({ params }: Props) {
             components={mdxComponents}
             options={{
               mdxOptions: {
+                remarkPlugins: [remarkGfm],
                 rehypePlugins: [
                   rehypeSlug,
                   [rehypePrettyCode, { theme: "github-dark", keepBackground: true }],

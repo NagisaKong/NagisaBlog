@@ -252,6 +252,33 @@ export async function deleteProject(id: number): Promise<void> {
   await sql`DELETE FROM projects WHERE id = ${id}`;
 }
 
+// ── Site Settings ─────────────────────────────────────────────────────────────
+
+async function ensureSettingsTable(): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `;
+}
+
+export async function getSiteSetting(key: string): Promise<string | null> {
+  await ensureSettingsTable();
+  const { rows } = await sql<{ value: string }>`
+    SELECT value FROM site_settings WHERE key = ${key} LIMIT 1
+  `;
+  return rows[0]?.value ?? null;
+}
+
+export async function setSiteSetting(key: string, value: string): Promise<void> {
+  await ensureSettingsTable();
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${key}, ${value})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+  `;
+}
+
 // ── Schema init (run once) ───────────────────────────────────────────────────
 
 export async function initSchema(): Promise<void> {
@@ -286,6 +313,12 @@ export async function initSchema(): Promise<void> {
       demo_url    TEXT,
       featured    BOOLEAN DEFAULT false,
       created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
     )
   `;
 }
