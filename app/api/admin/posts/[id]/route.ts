@@ -1,6 +1,6 @@
-import { updatePost, deletePost, getPostById } from "@/lib/db";
-import { requireAdmin } from "@/lib/adminAuth";
 import { revalidatePath } from "next/cache";
+import { getPostById, updatePost, deletePost } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function PATCH(
   req: Request,
@@ -11,11 +11,16 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json();
+
+  // 取旧 slug，便于 slug 变更时同时失效新旧两条路径
+  const existing = await getPostById(Number(id));
   const post = await updatePost(Number(id), body);
 
-  // 清除该文章页面和博客列表的缓存
-  revalidatePath(`/blog/${post.slug}`);
+  // 清除首页（最近文章）、博客列表和该文章页面的缓存
+  revalidatePath("/");
   revalidatePath("/blog");
+  if (existing?.slug) revalidatePath(`/blog/${existing.slug}`);
+  if (post.slug && post.slug !== existing?.slug) revalidatePath(`/blog/${post.slug}`);
 
   return Response.json(post);
 }
@@ -30,13 +35,12 @@ export async function DELETE(
   const { id } = await params;
 
   // 删除前先取 slug，用于精确清缓存
-  const post = await getPostById(Number(id));
+  const existing = await getPostById(Number(id));
   await deletePost(Number(id));
 
-  if (post) {
-    revalidatePath(`/blog/${post.slug}`);
-  }
+  revalidatePath("/");
   revalidatePath("/blog");
+  if (existing?.slug) revalidatePath(`/blog/${existing.slug}`);
 
   return new Response(null, { status: 204 });
 }

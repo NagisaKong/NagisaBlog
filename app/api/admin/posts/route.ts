@@ -1,6 +1,6 @@
+import { revalidatePath } from "next/cache";
 import { createPost } from "@/lib/db";
 import { requireAdmin } from "@/lib/adminAuth";
-import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   const deny = await requireAdmin();
@@ -15,7 +15,8 @@ export async function POST(req: Request) {
 
   const post = await createPost({ slug, title, description, content, tags, published });
 
-  // 新文章发布后清除博客列表缓存，并预热文章页缓存
+  // 新文章发布后清除首页（最近文章）、博客列表，并预热文章页缓存
+  revalidatePath("/");
   revalidatePath("/blog");
   revalidatePath(`/blog/${post.slug}`);
 

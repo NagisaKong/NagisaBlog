@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getAllPostsAdmin, getAllProjects } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   let posts: Awaited<ReturnType<typeof getAllPostsAdmin>> = [];
   let projects: Awaited<ReturnType<typeof getAllProjects>> = [];

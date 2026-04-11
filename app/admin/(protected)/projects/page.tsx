@@ -3,6 +3,8 @@ import { getAllProjects } from "@/lib/db";
 import { Badge } from "@/components/ui/badge";
 import DeleteProjectButton from "./DeleteProjectButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminProjectsPage() {
   let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
   try {

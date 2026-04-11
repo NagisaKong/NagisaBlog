@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { signOut } from "@/auth";
+import { redirect } from "next/navigation";
+import { auth, signOut } from "@/auth";
 
 const navItems = [
   { href: "/admin", label: "Dashboard" },
@@ -8,7 +9,17 @@ const navItems = [
   { href: "/admin/settings", label: "Settings" },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  const login = (session?.user as { login?: string } | undefined)?.login;
+  if (!session || login !== process.env.ADMIN_GITHUB_USERNAME) {
+    redirect("/admin/login");
+  }
+
   return (
     <div className="flex min-h-screen bg-zinc-950">
       {/* Sidebar */}

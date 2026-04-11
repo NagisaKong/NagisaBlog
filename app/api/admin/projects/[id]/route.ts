@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { updateProject, deleteProject } from "@/lib/db";
 import { requireAdmin } from "@/lib/adminAuth";
 
@@ -11,6 +12,9 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json();
   const project = await updateProject(Number(id), body);
+
+  revalidatePath("/projects");
+
   return Response.json(project);
 }
 
@@ -23,5 +27,8 @@ export async function DELETE(
 
   const { id } = await params;
   await deleteProject(Number(id));
+
+  revalidatePath("/projects");
+
   return new Response(null, { status: 204 });
 }
