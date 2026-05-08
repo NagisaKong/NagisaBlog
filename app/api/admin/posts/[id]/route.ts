@@ -16,7 +16,10 @@ export async function PATCH(
   const existing = await getPostById(Number(id));
   const post = await updatePost(Number(id), body);
 
-  // 清除该文章页面和博客列表的缓存
+  // 清除该文章页面和博客列表的缓存；slug 改名时连旧 URL 一起清
+  if (existing && existing.slug !== post.slug) {
+    revalidatePath(`/blog/${existing.slug}`);
+  }
   revalidatePath(`/blog/${post.slug}`);
   revalidatePath("/blog");
 

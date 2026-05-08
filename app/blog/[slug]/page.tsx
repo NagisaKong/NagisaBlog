@@ -17,7 +17,7 @@ import ViewCounter from "@/components/ViewCounter";
 import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type Props = {
   params: Promise<{ slug: string }>;
