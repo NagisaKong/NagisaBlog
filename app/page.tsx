@@ -56,7 +56,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-14">
+    <div className="space-y-14">
       {/* Profile / Hero */}
       <section className="pt-4 sm:pt-8">
         <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
